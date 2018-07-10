@@ -410,7 +410,12 @@ static void bus_error_strerror(sd_bus_error *e, int error) {
                         return;
 
                 errno = 0;
+#ifndef __GLIBC__
+                strerror_r(error, m, k);
+                x = m;
+#else
                 x = strerror_r(error, m, k);
+#endif
                 if (errno == ERANGE || strlen(x) >= k - 1) {
                         free(m);
                         k *= 2;
@@ -595,8 +600,12 @@ const char* _bus_error_message(const sd_bus_error *e, int error, char buf[static
 
         if (e && e->message)
                 return e->message;
-
+#ifndef __GLIBC__
+        strerror_r(abs(error), buf, ERRNO_BUF_LEN);
+        return buf;
+#else
         return strerror_r(abs(error), buf, ERRNO_BUF_LEN);
+#endif
 }
 
 static bool map_ok(const sd_bus_error_map *map) {
