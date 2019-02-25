@@ -1,7 +1,9 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 #pragma once
 
+#ifdef __GLIBC__
 #include <linux/prctl.h>
+#endif
 
 #include "macro.h"
 
