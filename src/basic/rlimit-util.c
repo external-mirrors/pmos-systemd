@@ -45,7 +45,7 @@ int setrlimit_closest(int resource, const struct rlimit *rlim) {
             fixed.rlim_max == highest.rlim_max)
                 return 0;
 
-        log_debug("Failed at setting rlimit " RLIM_FMT " for resource RLIMIT_%s. Will attempt setting value " RLIM_FMT " instead.", rlim->rlim_max, rlimit_to_string(resource), fixed.rlim_max);
+        log_debug("Failed at setting rlimit " RLIM_FMT " for resource RLIMIT_%s. Will attempt setting value " RLIM_FMT " instead.", (uintmax_t)rlim->rlim_max, rlimit_to_string(resource), (uintmax_t)fixed.rlim_max);
 
         return RET_NERRNO(setrlimit(resource, &fixed));
 }
@@ -308,13 +308,13 @@ int rlimit_format(const struct rlimit *rl, char **ret) {
         if (rl->rlim_cur >= RLIM_INFINITY && rl->rlim_max >= RLIM_INFINITY)
                 r = free_and_strdup(&s, "infinity");
         else if (rl->rlim_cur >= RLIM_INFINITY)
-                r = asprintf(&s, "infinity:" RLIM_FMT, rl->rlim_max);
+                r = asprintf(&s, "infinity:" RLIM_FMT, (uintmax_t)rl->rlim_max);
         else if (rl->rlim_max >= RLIM_INFINITY)
-                r = asprintf(&s, RLIM_FMT ":infinity", rl->rlim_cur);
+                r = asprintf(&s, RLIM_FMT ":infinity", (uintmax_t)rl->rlim_cur);
         else if (rl->rlim_cur == rl->rlim_max)
-                r = asprintf(&s, RLIM_FMT, rl->rlim_cur);
+                r = asprintf(&s, RLIM_FMT, (uintmax_t)rl->rlim_cur);
         else
-                r = asprintf(&s, RLIM_FMT ":" RLIM_FMT, rl->rlim_cur, rl->rlim_max);
+                r = asprintf(&s, RLIM_FMT ":" RLIM_FMT, (uintmax_t)rl->rlim_cur, (uintmax_t)rl->rlim_max);
         if (r < 0)
                 return -ENOMEM;
 
@@ -423,7 +423,7 @@ int rlimit_nofile_safe(void) {
         rl.rlim_max = MIN(rl.rlim_max, (rlim_t) read_nr_open());
         rl.rlim_cur = MIN((rlim_t) FD_SETSIZE, rl.rlim_max);
         if (setrlimit(RLIMIT_NOFILE, &rl) < 0)
-                return log_debug_errno(errno, "Failed to lower RLIMIT_NOFILE's soft limit to " RLIM_FMT ": %m", rl.rlim_cur);
+                return log_debug_errno(errno, "Failed to lower RLIMIT_NOFILE's soft limit to " RLIM_FMT ": %m", (uintmax_t)rl.rlim_cur);
 
         return 1;
 }
