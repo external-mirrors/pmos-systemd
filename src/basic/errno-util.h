@@ -15,8 +15,16 @@
  * https://stackoverflow.com/questions/34880638/compound-literal-lifetime-and-if-blocks
  *
  * Note that we use the GNU variant of strerror_r() here. */
-#define STRERROR(errnum) strerror_r(abs(errnum), (char[ERRNO_BUF_LEN]){}, ERRNO_BUF_LEN)
+static inline const char * STRERROR(int errnum);
 
+static inline const char * STRERROR(int errnum) {
+#ifdef __GLIBC__
+        return strerror_r(abs(errnum), (char[ERRNO_BUF_LEN]){}, ERRNO_BUF_LEN);
+#else
+        static __thread char buf[ERRNO_BUF_LEN];
+        return strerror_r(abs(errnum), buf, ERRNO_BUF_LEN) ? "unknown error" : buf;
+#endif
+}
 /* A helper to print an error message or message for functions that return 0 on EOF.
  * Note that we can't use ({ … }) to define a temporary variable, so errnum is
  * evaluated twice. */
