@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 #include <stddef.h>
+#include <net/if_arp.h>
 
 const char* arphrd_to_name(int id);
 int arphrd_from_name(const char *name);

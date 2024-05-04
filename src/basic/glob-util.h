@@ -6,6 +6,7 @@
 
 #include "macro.h"
 #include "string-util.h"
+#include "missing_type.h"
 
 /* Note: this function modifies pglob to set various functions. */
 int safe_glob(const char *path, int flags, glob_t *pglob);

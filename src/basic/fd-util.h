@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <sys/socket.h>
+#include <sys/file.h>
 
 #include "macro.h"
 #include "missing_fcntl.h"

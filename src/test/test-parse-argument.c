@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
 #include <signal.h>
+#include <libgen.h>
 
 #include "parse-argument.h"
 #include "stdio-util.h"

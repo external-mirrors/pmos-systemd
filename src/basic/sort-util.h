@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "macro.h"
+#include "missing_type.h"
 
 /* This is the same as glibc's internal __compar_d_fn_t type. glibc exports a public comparison_fn_t, for the
  * external type __compar_fn_t, but doesn't do anything similar for __compar_d_fn_t. Let's hence do that

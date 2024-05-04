@@ -5,7 +5,7 @@
 
 #include <arpa/inet.h>
 #include <linux/filter.h>
-#include <netinet/if_ether.h>
+#include <linux/if_ether.h>
 
 #include "arp-util.h"
 #include "ether-addr-util.h"
