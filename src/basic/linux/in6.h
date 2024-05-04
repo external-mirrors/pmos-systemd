@@ -22,6 +22,7 @@
 #ifndef _UAPI_LINUX_IN6_H
 #define _UAPI_LINUX_IN6_H
 
+#include <netinet/in.h>
 #include <linux/types.h>
 #include <linux/libc-compat.h>
 

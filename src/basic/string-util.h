@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+#include <libgen.h>
 
 #include "alloc-util.h"
 #include "macro.h"

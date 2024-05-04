@@ -10,3 +10,19 @@
 #if !HAVE_CHAR16_T
 #  define char16_t uint16_t
 #endif
+
+#ifndef __GLIBC__
+typedef int (*comparison_fn_t)(const void *, const void *);
+#endif
+
+#ifndef FTW_CONTINUE
+#define FTW_CONTINUE 0
+#endif
+
+#ifndef GLOB_BRACE
+#define GLOB_BRACE 0
+#endif
+
+#ifndef GLOB_ALTDIRFUNC
+#define GLOB_ALTDIRFUNC 0
+#endif

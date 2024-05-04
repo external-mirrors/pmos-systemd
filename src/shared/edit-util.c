@@ -212,7 +212,7 @@ static int create_edit_temp_file(EditFile *e, const char *contents, size_t conte
         if (fchmod(fileno(f), 0644) < 0)
                 return log_error_errno(errno, "Failed to change mode of temporary file '%s': %m", temp);
 
-        if (e->context->stdin) {
+        if (e->context->_stdin) {
                 if (fwrite(contents, 1, contents_size, f) != contents_size)
                         return log_error_errno(SYNTHETIC_ERRNO(EIO),
                                                "Failed to copy input to temporary file '%s'.", temp);
@@ -326,7 +326,7 @@ static int strip_edit_temp_file(EditFile *e) {
         if (!tmp)
                 return log_oom();
 
-        if (e->context->marker_start && !e->context->stdin) {
+        if (e->context->marker_start && !e->context->_stdin) {
                 /* Trim out the lines between the two markers */
                 char *contents_start, *contents_end;
 
@@ -374,7 +374,7 @@ int do_edit_files_and_install(EditFileContext *context) {
         if (context->n_files == 0)
                 return log_debug_errno(SYNTHETIC_ERRNO(ENOENT), "Got no files to edit.");
 
-        if (context->stdin) {
+        if (context->_stdin) {
                 r = read_full_stream(stdin, &data, &data_size);
                 if (r < 0)
                         return log_error_errno(r, "Failed to read stdin: %m");
@@ -386,7 +386,7 @@ int do_edit_files_and_install(EditFileContext *context) {
                         return r;
         }
 
-        if (!context->stdin) {
+        if (!context->_stdin) {
                 r = run_editor(context);
                 if (r < 0)
                         return r;

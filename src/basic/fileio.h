@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/file.h>
 
 #include "macro.h"
 #include "time-util.h"

@@ -12,6 +12,7 @@
 #include "rm-rf.h"
 #include "tests.h"
 #include "tmpfile-util.h"
+#include "missing_type.h"
 
 TEST(glob_first) {
         char *first, name[] = "/tmp/test-glob_first.XXXXXX";
@@ -60,13 +61,7 @@ TEST(glob_no_dot) {
         char template[] = "/tmp/test-glob-util.XXXXXXX";
         const char *fn;
 
-        _cleanup_globfree_ glob_t g = {
-                .gl_closedir = closedir_wrapper,
-                .gl_readdir = (struct dirent *(*)(void *)) readdir_no_dot,
-                .gl_opendir = (void *(*)(const char *)) opendir,
-                .gl_lstat = lstat,
-                .gl_stat = stat,
-        };
+        _cleanup_globfree_ glob_t g = {};
 
         int r;
 
