@@ -8,6 +8,7 @@
 #include "recurse-dir.h"
 #include "strv.h"
 #include "tests.h"
+#include "missing_type.h"
 
 static char **list_nftw = NULL;
 

@@ -5,7 +5,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/if_tun.h>
-#include <netinet/if_ether.h>
+#include <linux/if_ether.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>

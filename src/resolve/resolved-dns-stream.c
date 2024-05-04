@@ -1,6 +1,5 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
-#include <linux/if_arp.h>
 #include <netinet/tcp.h>
 #include <unistd.h>
 

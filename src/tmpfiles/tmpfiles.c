@@ -2572,9 +2572,7 @@ finish:
 }
 
 static int glob_item(Context *c, Item *i, action_t action) {
-        _cleanup_globfree_ glob_t g = {
-                .gl_opendir = (void *(*)(const char *)) opendir_nomod,
-        };
+        _cleanup_globfree_ glob_t g = {};
         int r;
 
         assert(c);
@@ -2600,9 +2598,7 @@ static int glob_item_recursively(
                 Item *i,
                 fdaction_t action) {
 
-        _cleanup_globfree_ glob_t g = {
-                .gl_opendir = (void *(*)(const char *)) opendir_nomod,
-        };
+        _cleanup_globfree_ glob_t g = {};
         int r;
 
         assert(c);

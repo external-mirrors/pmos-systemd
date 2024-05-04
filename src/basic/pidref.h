@@ -4,6 +4,7 @@
 typedef struct PidRef PidRef;
 
 #include "macro.h"
+#include "signal.h"
 #include "process-util.h"
 
 /* An embeddable structure carrying a reference to a process. Supposed to be used when tracking processes

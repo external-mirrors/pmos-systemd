@@ -16,7 +16,7 @@
 
 #include <linux/const.h>
 #include <linux/types.h>
-#include <linux/if_ether.h>
+#include <netinet/if_ether.h>
 
 #include <limits.h> /* for INT_MAX */
 
