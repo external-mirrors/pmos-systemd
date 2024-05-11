@@ -37,7 +37,7 @@ static int get_runpath_from_dynamic(const ElfW(Dyn) *d, ElfW(Addr) bias, const c
                          * using the bias calculated earlier. */
                         if (d->d_un.d_val != 0)
                                 strtab = (const char *) ((uintptr_t) d->d_un.d_val
-#if defined(__mips__) || defined(__riscv)
+#if defined(__mips__) || defined(__riscv) || true
                                          + bias
 #endif
                                 );
