@@ -1,6 +1,10 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 #pragma once
 
+#if SD_BOOT
+#  include "efi.h"
+#endif
+
 #include <stddef.h>
 
 #if SD_BOOT

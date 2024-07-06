@@ -1,6 +1,10 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 #pragma once
 
+#if SD_BOOT
+#define __DEFINED_wchar_t 1
+#endif
+
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>

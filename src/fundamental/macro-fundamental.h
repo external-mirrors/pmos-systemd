@@ -5,6 +5,10 @@
 #  include <assert.h>
 #endif
 
+#if SD_BOOT
+#  define __DEFINED_wchar_t 1
+#endif
+
 #include <limits.h>
 #include <stdalign.h>
 #include <stdbool.h>
