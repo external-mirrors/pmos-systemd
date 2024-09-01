@@ -1,0 +1,138 @@
+pkgname=systemd
+pkgver=$(cat meson.version)_$(date -I | tr -d '-')
+pkgrel=0
+pkgdesc="The artifacts version from CI (pmos/systemd)"
+url="https://gitlab.com/postmarketOS/systemd"
+arch="all"
+license="MIT AND GPL-2.0-only AND LGPL-2.1-or-later"
+
+# We use the dbus-dev and polkit-dev from pmOS/builtin systemd automatically
+makedepends="
+	acl-dev
+	audit-dev
+	bash
+	bash-completion
+	clang
+	cmake
+	coreutils
+	cryptsetup-dev
+	dbus-dev
+	elfutils
+	glib-dev
+	gnu-efi-dev
+	gperf
+	kmod-dev
+	libapparmor-dev
+	libbpf-dev
+	libbz2
+	libcap-dev
+	libfido2-dev
+	libgcc
+	libgcrypt-dev
+	libintl
+	libiptcdata-dev
+	libmicrohttpd-dev
+	libpwquality
+	libqrencode-dev
+	libseccomp-dev
+	libselinux-dev
+	libxkbcommon-dev
+	linux-pam-dev
+	llvm15
+	lz4-dev
+	meson
+	musl-dev
+	pcre2-dev
+	perl
+	pkgconf
+	polkit-dev
+	py3-jinja2
+	py3-lxml
+	python3-dev
+	rsync
+	tpm2-tss-mu
+	tzdata
+	util-linux-dev
+	xz-dev
+	zstd-dev
+	"
+
+depends="
+	!openrc
+	kbd
+	kmod
+	util-linux-login
+	less
+	so:libkmod.so.2
+	"
+
+builddir="$startdir"
+subpackages="$pkgname-dev $pkgname-dbg $pkgname-lang"
+
+export CFLAGS="$CFLAGS -D__UAPI_DEF_ETHHDR=0" # see src/basic/linux/if_ether.h
+build() {
+	abuild-meson \
+		-Dmode=release \
+		\
+		-Dkmod-path=/bin/kmod \
+		-Dsulogin-path=/sbin/sulogin \
+		\
+		-Ddebug-shell=/bin/ash \
+		-Dpolkit=enabled \
+		-Dpam=enabled \
+		-Dpamlibdir=/usr/lib/security \
+		-Dpamconfdir=/etc/pam.d \
+		\
+		-Dutmp=false \
+		-Dldconfig=false \
+		-Duserdb=false \
+		-Dhomed=disabled \
+		-Dnss-myhostname=false \
+		-Dnss-mymachines=disabled \
+		-Dnss-resolve=disabled \
+		-Dnss-systemd=false \
+		-Dsysusers=false \
+		-Dselinux=disabled \
+		\
+		-Dsystem-alloc-uid-min=101 \
+		-Dsystem-alloc-gid-min=101 \
+		-Dsystem-uid-max=999 \
+		-Dsystem-gid-max=999 \
+		-Dwheel-group=true \
+		-Dnobody-user=nobody \
+		-Dnobody-group=nobody \
+		\
+		-Ddefault-kill-user-processes=true \
+		-Dgshadow=false \
+		\
+		-Ddns-over-tls=openssl \
+		\
+		-Didn=false \
+		-Dsysvinit-path="" \
+		build .
+	meson compile ${JOBS:+-j ${JOBS}} -C build
+}
+
+check() {
+	meson test --no-rebuild --print-errorlogs -C build
+}
+
+package() {
+	provides="
+		eudev
+		udev
+		eudev-libs
+		resolvconf
+		elogind
+		"
+	provider_priority=100
+
+	DESTDIR="$pkgdir" meson install --no-rebuild -C build
+}
+
+dev() {
+	provides="eudev-dev udev-dev"
+	provider_priority=100
+
+	default_dev
+}

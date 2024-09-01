@@ -1,0 +1,46 @@
+image: alpine:latest
+
+before_script: &global_before_scripts
+  - ".ci/prepare.sh"
+
+# This defines the rules for when a pipeline should run.
+workflow:
+  rules:
+    # Don't run branch pipeline if an MR is open (only the MR pipeline will run)
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push"
+      when: never
+    # Run for merge requests
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Run scheduled pipeline for autoupdate or manually triggered pipeline
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"
+
+stages:
+  - build
+  - test
+
+# ---
+
+.build:
+  stage: build
+  script:
+    - ".ci/build.sh"
+  after_script:
+    - cp -r /home/build/packages/ packages/ || true
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - packages/
+      - build/
+  timeout: 1 h
+
+build_0:
+  extends: .build
+
+test:
+  stage: test
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - build/meson-logs/
+  script:
+    - ".ci/test.sh"
