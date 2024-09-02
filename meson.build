@@ -1103,6 +1103,9 @@ else
                         # Check if 'clang -target bpf' is supported.
                         clang_supports_bpf = run_command(clang, '-target', 'bpf', '--print-supported-cpus', check : false).returncode() == 0
                 endif
+                if bpf_framework.enabled() and not clang_supports_bpf
+                        error('bpf-framework was enabled but clang does not support bpf')
+                endif
         elif bpf_compiler == 'gcc'
                 bpf_gcc = find_program('bpf-gcc',
                                        'bpf-none-gcc',
@@ -2090,7 +2093,7 @@ libsystemd = shared_library(
                      # Make sure our library is never deleted from memory, so that our open logging fds don't leak on dlopen/dlclose cycles.
                      '-z', 'nodelete',
                      '-Wl,--version-script=' + libsystemd_sym_path],
-        link_with : [libbasic],
+        link_with : [libbasic_static],
         link_whole : [libsystemd_static],
         dependencies : [librt,
                         threads,
@@ -2255,7 +2258,7 @@ nss_template = {
         'link_with' : [
                 libsystemd_static,
                 libshared_static,
-                libbasic,
+                libbasic_static,
         ],
         'dependencies' : [
                 librt,
@@ -2661,12 +2664,6 @@ foreach executable : ['systemd-journal-remote', 'systemd-measure']
 endforeach
 
 if mkosi.found()
-        genkey = custom_target('genkey',
-                output : ['mkosi.key', 'mkosi.crt'],
-                command : [mkosi, '--force', 'genkey'],
-                depends : mkosi_depends,
-        )
-
         custom_target('mkosi',
                 build_always_stale : true,
                 build_by_default: false,
@@ -2678,14 +2675,11 @@ if mkosi.found()
                         '--output-dir', meson.current_build_dir() / 'mkosi.output',
                         '--cache-dir', meson.current_build_dir() / 'mkosi.cache',
                         '--build-dir', meson.current_build_dir() / 'mkosi.builddir',
-                        '--secure-boot-key', meson.current_build_dir() / 'mkosi.key',
-                        '--secure-boot-certificate', meson.current_build_dir() / 'mkosi.crt',
-                        '--verity-key', meson.current_build_dir() / 'mkosi.key',
-                        '--verity-certificate', meson.current_build_dir() / 'mkosi.crt',
+                        '--extra-search-path', meson.current_build_dir(),
                         '--force',
                         'build',
                 ],
-                depends : mkosi_depends + [genkey],
+                depends : mkosi_depends,
         )
 endif
 
