@@ -363,15 +363,15 @@ static int get_path(uint64_t type, char **buffer, const char **ret) {
                 return 0;
 
         case SD_PATH_SYSCTL:
-                *ret = PREFIX_NOSLASH "/lib/sysctl.d";
+                *ret = ROOTPREFIX_NOSLASH "/lib/sysctl.d";
                 return 0;
 
         case SD_PATH_BINFMT:
-                *ret = PREFIX_NOSLASH "/lib/binfmt.d";
+                *ret = ROOTPREFIX_NOSLASH "/lib/binfmt.d";
                 return 0;
 
         case SD_PATH_MODULES_LOAD:
-                *ret = PREFIX_NOSLASH "/lib/modules-load.d";
+                *ret = ROOTPREFIX_NOSLASH "/lib/modules-load.d";
                 return 0;
 
         case SD_PATH_CATALOG:
@@ -531,6 +531,9 @@ static int get_search(uint64_t type, char ***ret) {
                                                true,
                                                ARRAY_SBIN_BIN("/usr/local/"),
                                                ARRAY_SBIN_BIN("/usr/"),
+#if HAVE_SPLIT_USR
+                                               ARRAY_SBIN_BIN("/"),
+#endif
                                                NULL);
 
         case SD_PATH_SEARCH_LIBRARY_PRIVATE:
@@ -541,6 +544,9 @@ static int get_search(uint64_t type, char ***ret) {
                                                false,
                                                "/usr/local/lib",
                                                "/usr/lib",
+#if HAVE_SPLIT_USR
+                                               "/lib",
+#endif
                                                NULL);
 
         case SD_PATH_SEARCH_LIBRARY_ARCH:
@@ -550,6 +556,9 @@ static int get_search(uint64_t type, char ***ret) {
                                                "LD_LIBRARY_PATH",
                                                true,
                                                LIBDIR,
+#if HAVE_SPLIT_USR
+                                               ROOTLIBDIR,
+#endif
                                                NULL);
 
         case SD_PATH_SEARCH_SHARED:

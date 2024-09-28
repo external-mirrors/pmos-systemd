@@ -12,7 +12,6 @@ in_files = [
         'systemd.hu.catalog',
         'systemd.it.catalog',
         'systemd.ko.catalog',
-        'systemd.pl.catalog',
         'systemd.pt_BR.catalog',
         'systemd.ru.catalog',
         'systemd.sr.catalog',
