@@ -167,6 +167,9 @@ static const MountEntry protect_kernel_tunables_sys_table[] = {
 
 /* ProtectKernelModules= option */
 static const MountEntry protect_kernel_modules_table[] = {
+#if HAVE_SPLIT_USR
+        { "/lib/modules",        MOUNT_INACCESSIBLE, true  },
+#endif
         { "/usr/lib/modules",    MOUNT_INACCESSIBLE, true  },
 };
 
@@ -224,6 +227,12 @@ static const MountEntry protect_system_yes_table[] = {
         { "/usr",                MOUNT_READ_ONLY,     false },
         { "/boot",               MOUNT_READ_ONLY,     true  },
         { "/efi",                MOUNT_READ_ONLY,     true  },
+#if HAVE_SPLIT_USR
+        { "/lib",                MOUNT_READ_ONLY,     true  },
+        { "/lib64",              MOUNT_READ_ONLY,     true  },
+        { "/bin",                MOUNT_READ_ONLY,     true  },
+        { "/sbin",               MOUNT_READ_ONLY,     true  },
+#endif
 };
 
 /* ProtectSystem=full includes ProtectSystem=yes */
@@ -232,6 +241,12 @@ static const MountEntry protect_system_full_table[] = {
         { "/boot",               MOUNT_READ_ONLY,     true  },
         { "/efi",                MOUNT_READ_ONLY,     true  },
         { "/etc",                MOUNT_READ_ONLY,     false },
+#if HAVE_SPLIT_USR
+        { "/lib",                MOUNT_READ_ONLY,     true  },
+        { "/lib64",              MOUNT_READ_ONLY,     true  },
+        { "/bin",                MOUNT_READ_ONLY,     true  },
+        { "/sbin",               MOUNT_READ_ONLY,     true  },
+#endif
 };
 
 /* ProtectSystem=strict table. In this strict mode, we mount everything read-only, except for /proc, /dev,

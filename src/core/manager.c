@@ -1064,6 +1064,10 @@ int manager_new(RuntimeScope runtime_scope, ManagerTestRunFlags test_run_flags, 
                 }
         }
 
+        m->taint_usr =
+                !in_initrd() &&
+                dir_is_empty("/usr", /* ignore_hidden_or_backup= */ false) > 0;
+
         /* Note that we do not set up the notify fd here. We do that after deserialization,
          * since they might have gotten serialized across the reexec. */
 
@@ -5076,7 +5080,6 @@ static int manager_dispatch_handoff_timestamp_fd(sd_event_source *source, int fd
         FOREACH_ARRAY(u, units, n_units) {
                 if (!UNIT_VTABLE(*u)->notify_handoff_timestamp)
                         continue;
-
                 UNIT_VTABLE(*u)->notify_handoff_timestamp(*u, ucred, &dt);
         }
 

@@ -15,10 +15,10 @@ option('split-usr', type : 'combo', choices : ['auto', 'true', 'false'], depreca
        description : 'This option is deprecated and will be removed in a future release')
 option('split-bin', type : 'combo', choices : ['auto', 'true', 'false'],
        description : 'sbin is not a symlink to bin')
-option('rootlibdir', type : 'string', deprecated: true,
-       description : 'This option is deprecated and will be removed in a future release')
-option('rootprefix', type : 'string', deprecated: true,
-       description : 'This option is deprecated and will be removed in a future release')
+option('rootlibdir', type : 'string',
+       description : '''[/usr]/lib/x86_64-linux-gnu or such''')
+option('rootprefix', type : 'string',
+       description : '''override the root prefix [default '/' if split-usr and '/usr' otherwise]''')
 option('link-udev-shared', type : 'boolean',
        description : 'link systemd-udevd and its helpers to libsystemd-shared.so')
 option('link-executor-shared', type : 'boolean',

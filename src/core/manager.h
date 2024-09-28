@@ -391,6 +391,8 @@ struct Manager {
         /* Flags */
         bool dispatching_load_queue;
 
+        bool taint_usr;
+
         /* Have we already sent out the READY=1 notification? */
         bool ready_sent;
 

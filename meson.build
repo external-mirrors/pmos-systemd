@@ -80,6 +80,9 @@ endif
 #####################################################################
 
 fs = import('fs')
+split_usr = get_option('split-usr') == 'true'
+conf.set10('HAVE_SPLIT_USR', split_usr)
+
 if get_option('split-bin') == 'auto'
         split_bin = not fs.is_symlink('/usr/sbin')
 else
@@ -122,6 +125,28 @@ includedir = prefixdir / get_option('includedir')
 datadir = prefixdir / get_option('datadir')
 localstatedir = '/' / get_option('localstatedir')
 
+rootprefixdir = get_option('rootprefix')
+# Unusual rootprefixdir values are used by some distros
+# (see https://github.com/systemd/systemd/pull/7461).
+rootprefix_default = split_usr ? '/' : '/usr'
+if rootprefixdir == ''
+        rootprefixdir = rootprefix_default
+endif
+rootprefixdir_noslash = rootprefixdir == '/' ? '' : rootprefixdir
+rootbindir = rootprefixdir / 'bin'
+rootsbindir = rootprefixdir / (split_bin ? 'sbin' : 'bin')
+rootlibexecdir = rootprefixdir / 'lib/systemd'
+
+rootlibdir = get_option('rootlibdir')
+if rootlibdir == ''
+        # This will be a relative path if libdir is in prefix.
+        rootlibdir = get_option('libdir')
+endif
+if not rootlibdir.startswith('/')
+        # If we have a relative path, add rootprefixdir to the front.
+        rootlibdir = rootprefixdir / rootlibdir
+endif
+rootpkglibdir = rootlibdir / 'systemd'
 libexecdir = prefixdir / 'lib/systemd'
 pkglibdir = libdir / 'systemd'
 
@@ -258,6 +283,11 @@ conf.set_quoted('PREFIX_NOSLASH',                             prefixdir_noslash)
 conf.set_quoted('RANDOM_SEED',                                randomseeddir / 'random-seed')
 conf.set_quoted('RANDOM_SEED_DIR',                            randomseeddir)
 conf.set_quoted('RC_LOCAL_PATH',                              get_option('rc-local'))
+conf.set_quoted('ROOTBINDIR',                                 rootbindir)
+conf.set_quoted('ROOTLIBDIR',                                 rootlibdir)
+conf.set_quoted('ROOTLIBEXECDIR',                             rootlibexecdir)
+conf.set_quoted('ROOTPREFIX',                                 rootprefixdir)
+conf.set_quoted('ROOTPREFIX_NOSLASH',                         rootprefixdir_noslash)
 conf.set_quoted('SSHCONFDIR',                                 sshconfdir)
 conf.set_quoted('SSHDCONFDIR',                                sshdconfdir)
 conf.set_quoted('SHELLPROFILEDIR',                            shellprofiledir)

@@ -1471,8 +1471,12 @@ const char* default_PATH(void) {
          * On error fall back to the safe value with both directories as configured… */
 
         if (split < 0)
-                STRV_FOREACH_PAIR(bin, sbin, STRV_MAKE("/usr/bin", "/usr/sbin",
-                                                       "/usr/local/bin", "/usr/local/sbin")) {
+                STRV_FOREACH_PAIR(bin, sbin, STRV_MAKE(
+# if HAVE_SPLIT_USR
+                                                        "/bin", "/sbin",
+# endif
+                                                        "/usr/bin", "/usr/sbin",
+                                                        "/usr/local/bin", "/usr/local/sbin")) {
                         r = inode_same(*bin, *sbin, AT_NO_AUTOMOUNT);
                         if (r > 0 || r == -ENOENT)
                                 continue;
