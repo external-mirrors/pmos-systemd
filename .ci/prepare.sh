@@ -10,10 +10,11 @@ set -x
 
 apk upgrade -U
 
-echo "@pmos http://mirror.postmarketos.org/postmarketos/staging/systemd/master" >> /etc/apk/repositories
-apk add -U --allow-untrusted postmarketos-keys@pmos
+echo "http://mirror.postmarketos.org/postmarketos/master" >> /etc/apk/repositories
+echo "http://mirror.postmarketos.org/postmarketos/extra-repos/systemd/master" >> /etc/apk/repositories
+apk add -U --allow-untrusted postmarketos-keys
 
-apk add alpine-base@pmos alpine-sdk abuild-sudo !openrc
+apk add alpine-base alpine-sdk abuild-sudo !openrc
 
 adduser -D build
 adduser build abuild
