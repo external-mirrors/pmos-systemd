@@ -1,5 +1,5 @@
 pkgname=systemd
-pkgver=$(cat meson.version)_$(date -I | tr -d '-')
+pkgver=$(cat meson.version)_git$(date -I | tr -d '-')
 pkgrel=0
 pkgdesc="The artifacts version from CI (pmos/systemd)"
 url="https://gitlab.com/postmarketOS/systemd"
@@ -8,52 +8,50 @@ license="MIT AND GPL-2.0-only AND LGPL-2.1-or-later"
 
 # We use the dbus-dev and polkit-dev from pmOS/builtin systemd automatically
 makedepends="
+	bash
+	bash-completion-dev
+	coreutils
+	gettext-dev
+	gperf
+	libcap-dev
+	meson
+	musl-dev
+	pkgconf
+	py3-jinja2
+	rsync
+	tzdata
+	util-linux-dev
+	dbus-dev
+	linux-pam-dev
+	polkit-dev
+
 	acl-dev
 	audit-dev
-	bash
-	bash-completion
-	clang
-	cmake
-	coreutils
+	bzip2-dev
 	cryptsetup-dev
-	dbus-dev
-	elfutils
+	curl-dev
+	elfutils-dev
 	glib-dev
-	gnu-efi-dev
-	gperf
+	gnutls-dev
 	kmod-dev
 	libapparmor-dev
 	libbpf-dev
-	libbz2
-	libcap-dev
-	libfido2-dev
-	libgcc
 	libgcrypt-dev
-	libintl
+	libgcrypt-dev
+	libgpg-error-dev
 	libiptcdata-dev
 	libmicrohttpd-dev
-	libpwquality
+	libpwquality-dev
 	libqrencode-dev
 	libseccomp-dev
 	libselinux-dev
 	libxkbcommon-dev
-	linux-pam-dev
-	llvm15
 	lz4-dev
-	meson
-	musl-dev
+	openssl-dev
 	pcre2-dev
-	perl
-	pkgconf
-	polkit-dev
-	py3-jinja2
-	py3-lxml
-	python3-dev
-	rsync
 	tpm2-tss-mu
-	tzdata
-	util-linux-dev
 	xz-dev
+	zlib-dev
 	zstd-dev
 	"
 
@@ -67,32 +65,53 @@ depends="
 	"
 
 builddir="$startdir"
-subpackages="$pkgname-dev $pkgname-dbg $pkgname-lang"
+subpackages="$pkgname-dev $pkgname-dbg $pkgname-lang $pkgname-doc"
 
 export CFLAGS="$CFLAGS -D__UAPI_DEF_ETHHDR=0" # see src/basic/linux/if_ether.h
 build() {
 	abuild-meson \
-		-Dmode=release \
+		-Dman=enabled \
+		-Dpam=enabled \
+		-Dpolkit=enabled \
+		-Dcryptolib=gcrypt \
+		-Ddefault-network=true \
+		-Ddns-over-tls=gnutls \
+		-Defi=true \
+		-Delfutils=enabled \
+		-Dgcrypt=true \
+		-Dlibfido2=disabled \
 		\
-		-Dkmod-path=/bin/kmod \
-		-Dsulogin-path=/sbin/sulogin \
+		-Dmode=release \
+		-Dsplit-bin=true \
+		-Dsplit-usr=true \
 		\
 		-Ddebug-shell=/bin/ash \
-		-Dpolkit=enabled \
-		-Dpam=enabled \
-		-Dpamlibdir=/usr/lib/security \
+		-Dkmod-path=/bin/kmod \
+		-Dntp-servers="0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 4.pool.ntp.org" \
 		-Dpamconfdir=/etc/pam.d \
+		-Dpamlibdir=/usr/lib/security \
+		-Dsulogin-path=/sbin/sulogin \
+		-Dsupport-url="https://gitlab.postmarketos.org/groups/postmarketOS/-/issues" \
+		-Dfirst-boot-full-preset=true \
 		\
+		-Dbootloader=disabled \
 		-Dutmp=false \
-		-Dldconfig=false \
-		-Duserdb=false \
+		-Dgshadow=false \
 		-Dhomed=disabled \
+		-Didn=false \
+		-Dkernel-install=false \
+		-Dldconfig=false \
 		-Dnss-myhostname=false \
 		-Dnss-mymachines=disabled \
 		-Dnss-resolve=disabled \
 		-Dnss-systemd=false \
-		-Dsysusers=false \
+		-Drpmmacrosdir="no" \
 		-Dselinux=disabled \
+		-Dsysvinit-path="" \
+		-Dukify=disabled \
+		-Duserdb=false \
+		\
+		-Dhtml=disabled \
 		\
 		-Dsystem-alloc-uid-min=101 \
 		-Dsystem-alloc-gid-min=101 \
@@ -102,13 +121,13 @@ build() {
 		-Dnobody-user=nobody \
 		-Dnobody-group=nobody \
 		\
+		-Dcreate-log-dirs=true \
 		-Ddefault-kill-user-processes=true \
-		-Dgshadow=false \
+		-Ddefault-locale=en_US.UTF-8 \
+		-Dfexecve=true \
 		\
-		-Ddns-over-tls=openssl \
-		\
-		-Didn=false \
-		-Dsysvinit-path="" \
+		-Ddefault-dns-over-tls=yes \
+		-Ddns-servers="9.9.9.10#dns10.quad9.net 149.112.112.10#dns10.quad9.net 2620:fe::10#dns10.quad9.net 2620:fe::fe:10#dns10.quad9.net" \
 		build .
 	meson compile ${JOBS:+-j ${JOBS}} -C build
 }
@@ -119,12 +138,31 @@ check() {
 
 package() {
 	provides="
-		eudev
-		udev
-		eudev-libs
-		resolvconf
+		busctl
 		elogind
+		eudev
+		eudev-libs
+		openrc-settingsd=$pkgver-r$pkgrel
+		resolvconf
+		udev
+
+		$pkgname-libs=$pkgver-r$pkgrel
+		$pkgname-libs-private=$pkgver-r$pkgrel
+		$pkgname-journald-remote=$pkgver-r$pkgrel
+		$pkgname-journald-upload=$pkgver-r$pkgrel
+		$pkgname-journald=$pkgver-r$pkgrel
+		$pkgname-journald-systemd=$pkgver-r$pkgrel
+		$pkgname-udevd=$pkgver-r$pkgrel
+		$pkgname-logind=$pkgver-r$pkgrel
+		$pkgname-logind-systemd=$pkgver-r$pkgrel
+		$pkgname-timesyncd=$pkgver-r$pkgrel
+		$pkgname-timesyncd-systemd=$pkgver-r$pkgrel
+		$pkgname-networkd=$pkgver-r$pkgrel
+		$pkgname-networkd-systemd=$pkgver-r$pkgrel
+		$pkgname-resolved=$pkgver-r$pkgrel
+		$pkgname-resolved-systemd=$pkgver-r$pkgrel
 		"
+	depends="!openrc"
 	provider_priority=100
 
 	DESTDIR="$pkgdir" meson install --no-rebuild -C build
