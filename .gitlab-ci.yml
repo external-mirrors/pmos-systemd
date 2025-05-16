@@ -1,8 +1,3 @@
-image: alpine:latest
-
-before_script: &global_before_scripts
-  - ".ci/prepare.sh"
-
 # This defines the rules for when a pipeline should run.
 workflow:
   rules:
@@ -19,11 +14,25 @@ stages:
   - test
 
 # ---
+.image:ubuntu:noble:
+  image: ubuntu:noble
+  before_script: &global_before_scripts
+    - .ci/prepare-apt.sh
 
-.build:
+.image:pmOS:edge:
+  image: alpine:edge
+  before_script: &global_before_scripts
+    - .ci/prepare-pmos.sh "master"
+
+.image:pmOS:v25_06:
+  image: alpine:3.22
+  before_script: &global_before_scripts
+    - .ci/prepare-pmos.sh "v25.06"
+
+.build:pmOS:
   stage: build
   script:
-    - ".ci/build.sh"
+    - ".ci/build-pmos.sh"
   after_script:
     - cp -r /home/build/packages/ packages/ || true
   artifacts:
@@ -33,14 +42,51 @@ stages:
       - build/
   timeout: 1 h
 
-build_0:
-  extends: .build
+.build:ubuntu:
+  stage: build
+  script:
+    - ".ci/build-apt.sh"
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - build/
 
-test:
+.test:pmOS:
   stage: test
+  script:
+    - ".ci/test-pmos.sh"
   artifacts:
     expire_in: 1 week
     paths:
       - build/meson-logs/
+
+.test:ubuntu:
+  stage: test
   script:
     - ".ci/test.sh"
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - build/meson-logs/
+
+# ---
+
+build:ubuntu:noble:
+  extends: [ ".build:ubuntu", ".image:ubuntu:noble"]
+
+build:pmOS:v25_06:
+  extends: [ ".build:pmOS", ".image:pmOS:v25_06" ]
+
+build:pmOS:edge:
+  extends: [ ".build:pmOS", ".image:pmOS:edge" ]
+
+test:pmOS:v25_06:
+  extends: [ ".test:pmOS", ".image:pmOS:v25_06" ]
+  needs: [ "build:pmOS:v25_06" ]
+
+test:pmOS:edge:
+  extends: [ ".test:pmOS", ".image:pmOS:edge" ]
+  needs: [ "build:pmOS:edge" ]
+
+test:ubuntu:noble:
+  extends: [ ".test:ubuntu", ".image:ubuntu:noble"]

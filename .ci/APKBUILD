@@ -56,7 +56,6 @@ makedepends="
 	"
 
 depends="
-	!openrc
 	kbd
 	kmod
 	util-linux-login

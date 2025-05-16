@@ -1,9 +1,3 @@
 #!/bin/sh
 
-if [ "$(id -u)" = 0 ] ; then
-	exec su build -c "sh -e $0"
-fi
-
-cp .ci/APKBUILD ./APKBUILD
-
-abuild -K deps check
+meson test --no-rebuild --print-errorlogs -C build
