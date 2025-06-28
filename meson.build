@@ -624,6 +624,7 @@ foreach ident : [
         ['setxattrat',        '''#include <sys/xattr.h>'''],    # no known header declares setxattrat
         ['removexattrat',     '''#include <sys/xattr.h>'''],    # no known header declares removexattrat
         ['renameat2',         '''#include <stdio.h>'''],        # since glibc-2.28
+        ['gnu_get_libc_version','''#include <gnu/libc-version.h>'''],
 ]
 
         have = cc.has_function(ident[0], prefix : ident[1], args : '-D_GNU_SOURCE')
