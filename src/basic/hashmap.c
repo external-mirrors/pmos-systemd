@@ -5,6 +5,7 @@
 #if HAVE_VALGRIND_VALGRIND_H
 #  include <valgrind/valgrind.h>
 #endif
+#include <unistd.h>
 
 #include "alloc-util.h"
 #include "extract-word.h"

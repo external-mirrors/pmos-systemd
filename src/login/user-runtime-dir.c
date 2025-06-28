@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
+#include <linux/quota.h>
 #include <sys/mount.h>
 
 #include "sd-bus.h"

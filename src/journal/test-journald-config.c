@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <sys/un.h>
+#include <sys/stat.h>
 
 #include "alloc-util.h"
 #include "journald-manager.h"

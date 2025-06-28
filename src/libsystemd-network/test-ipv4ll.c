@@ -4,6 +4,7 @@
 ***/
 
 #include <netinet/if_ether.h>
+#include <net/if_arp.h>
 #include <stdio.h>
 
 #include "sd-event.h"

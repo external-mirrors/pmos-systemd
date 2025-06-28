@@ -2,6 +2,7 @@
 
 #include <signal.h>
 #include <syslog.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "sd-id128.h"

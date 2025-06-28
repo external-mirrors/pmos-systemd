@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
+#include <sys/stat.h>
+
 #include "alloc-util.h"
 #include "hashmap.h"
 #include "journal-file-util.h"

@@ -4,6 +4,7 @@
 #include <poll.h>
 #include <stdlib.h>
 #include <sys/inotify.h>
+#include <sys/stat.h>
 #include <sys/vfs.h>
 #include <unistd.h>
 

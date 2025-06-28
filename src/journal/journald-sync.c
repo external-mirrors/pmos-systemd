@@ -3,6 +3,7 @@
 #include <linux/sockios.h>
 #include <poll.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
 
 #include "sd-varlink.h"
 

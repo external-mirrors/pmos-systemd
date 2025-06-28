@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <sys/statvfs.h>
 #include <sys/uio.h>
 #include <threads.h>

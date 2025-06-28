@@ -2,6 +2,7 @@
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "argv-util.h"
 #include "chattr-util.h"

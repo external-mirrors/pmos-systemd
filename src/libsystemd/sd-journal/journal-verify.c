@@ -2,6 +2,7 @@
 
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 
 #include "alloc-util.h"
 #include "ansi-color.h"

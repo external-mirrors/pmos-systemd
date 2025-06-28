@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/timex.h>
 #include <sys/resource.h>
 #include <sys/socket.h>
 

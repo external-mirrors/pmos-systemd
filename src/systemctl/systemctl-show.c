@@ -1,6 +1,8 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 
 #include <sys/mount.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "sd-bus.h"
 #include "sd-journal.h"

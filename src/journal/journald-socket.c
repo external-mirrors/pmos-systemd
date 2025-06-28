@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/uio.h>
 
 #include "alloc-util.h"
