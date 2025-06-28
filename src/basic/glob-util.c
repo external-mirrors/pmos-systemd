@@ -17,6 +17,7 @@ static void closedir_wrapper(void* v) {
 int safe_glob(const char *path, int flags, glob_t *pglob) {
         int k;
 
+#if HAVE_GLOB_ALTDIRFUNC
         /* We want to set GLOB_ALTDIRFUNC ourselves, don't allow it to be set. */
         assert(!(flags & GLOB_ALTDIRFUNC));
 
@@ -33,6 +34,11 @@ int safe_glob(const char *path, int flags, glob_t *pglob) {
 
         errno = 0;
         k = glob(path, flags | GLOB_ALTDIRFUNC, NULL, pglob);
+#else
+        errno = 0;
+        k = glob(path, flags, NULL, pglob);
+#endif
+
         if (k == GLOB_NOMATCH)
                 return -ENOENT;
         if (k == GLOB_NOSPACE)

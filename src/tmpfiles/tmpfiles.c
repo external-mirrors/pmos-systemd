@@ -2575,7 +2575,9 @@ finish:
 
 static int glob_item(Context *c, Item *i, action_t action) {
         _cleanup_globfree_ glob_t g = {
+#if HAVE_GLOB_ALTDIRFUNC
                 .gl_opendir = (void *(*)(const char *)) opendir_nomod,
+#endif
         };
         int r;
 
@@ -2603,7 +2605,9 @@ static int glob_item_recursively(
                 fdaction_t action) {
 
         _cleanup_globfree_ glob_t g = {
+#if HAVE_GLOB_ALTDIRFUNC
                 .gl_opendir = (void *(*)(const char *)) opendir_nomod,
+#endif
         };
         int r;
 

@@ -55,6 +55,7 @@ static void closedir_wrapper(void* v) {
         (void) closedir(v);
 }
 
+#if HAVE_GLOB_ALTDIRFUNC
 TEST(glob_no_dot) {
         char template[] = "/tmp/test-glob-util.XXXXXXX";
         const char *fn;
@@ -81,6 +82,7 @@ TEST(glob_no_dot) {
 
         (void) rm_rf(template, REMOVE_ROOT|REMOVE_PHYSICAL);
 }
+#endif
 
 TEST(safe_glob) {
         char template[] = "/tmp/test-glob-util.XXXXXXX";

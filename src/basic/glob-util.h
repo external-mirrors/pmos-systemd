@@ -5,6 +5,10 @@
 
 #include "forward.h"
 
+#if !HAVE_GLOB_BRACE
+#define GLOB_BRACE (0)
+#endif
+
 /* Note: this function modifies pglob to set various functions. */
 int safe_glob(const char *path, int flags, glob_t *pglob);
 

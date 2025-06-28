@@ -574,6 +574,15 @@ assert(long_max > 100000)
 conf.set_quoted('LONG_MAX_STR', '@0@'.format(long_max))
 
 foreach ident : [
+        ['GLOB_ALTDIRFUNC', '''#include <glob.h>'''],
+        ['GLOB_BRACE', '''#include <glob.h>'''],
+
+]
+        have = cc.get_define(ident[0], prefix : ident[1], args : '-D_GNU_SOURCE') != ''
+        conf.set10('HAVE_' + ident[0].underscorify().to_upper(), have)
+endforeach
+
+foreach ident : [
         ['struct dirent64',   '''#include <dirent.h>'''],       # for musl, but only for compile time check, see dirent-util.h
         ['struct sched_attr', '''#include <sched.h>'''],        # since glibc-2.41
 ]
