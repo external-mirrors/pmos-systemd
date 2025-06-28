@@ -259,3 +259,11 @@ static inline int missing_removexattrat(int fd, const char *path, int at_flags, 
 
 #  define removexattrat missing_removexattrat
 #endif
+
+#if !HAVE_RENAMEAT2
+static inline int missing_renameat2 (int oldfd, const char *old_name, int newfd, const char *new_name,
+          unsigned int flags) {
+        return syscall(__NR_renameat2, oldfd, old_name, newfd, new_name, flags);
+}
+#  define renameat2 missing_renameat2
+#endif
