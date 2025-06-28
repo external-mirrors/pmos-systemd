@@ -4,6 +4,8 @@
 #include <features.h>
 #include <linux/if.h>   /* IWYU pragma: export */
 
+#include "missing_cdefs.h"
+
 #define IF_NAMESIZE       16
 
 extern unsigned int if_nametoindex(const char *__ifname) __THROW;

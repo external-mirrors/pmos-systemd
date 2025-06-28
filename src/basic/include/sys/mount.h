@@ -9,6 +9,7 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
+#include "missing_cdefs.h"
 #include "missing_fcntl.h"
 #include "missing_fs.h"
 #include "missing_syscall_def.h"
