@@ -391,7 +391,7 @@ int nss_sgrp_for_group(const struct group *grp, struct sgrp *ret_sgrp, char **re
                 buf = mfree(buf);
         }
 #else
-        return -ESRCH;
+        return -ENOTSUP;
 #endif
 }
 
