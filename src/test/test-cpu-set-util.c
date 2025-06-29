@@ -4,6 +4,13 @@
 #include "cpu-set-util.h"
 #include "tests.h"
 
+#ifndef __CPU_MASK_TYPE
+#       define __CPU_MASK_TYPE unsigned long int
+typedef __CPU_MASK_TYPE __cpu_mask;
+#endif
+
+static_assert(sizeof(__cpu_mask) == sizeof(unsigned long));
+
 TEST(parse_cpu_set) {
         CPUSet c = {};
         _cleanup_free_ char *str = NULL;
