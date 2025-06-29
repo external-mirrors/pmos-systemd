@@ -13,6 +13,16 @@
 
 static char **list_nftw = NULL;
 
+/* ntfw_cb in this test doesn't use FTW_ACTIONRETVAL and hence just used
+ * FTW_CONTINUE as a nicer way to say "return 0 from fn".
+ */
+#ifndef FTW_CONTINUE
+#       define FTW_CONTINUE 0
+#       ifdef FTW_ACTIONRETVAL
+#               error "FTW_CONTINUE not defined but FTW_ACTIONRETVAL is defined"
+#       endif
+#endif /* FTW_CONTINUE */
+
 static int nftw_cb(
                 const char *fpath,
                 const struct stat *sb,
