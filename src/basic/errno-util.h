@@ -2,6 +2,7 @@
 #pragma once
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "forward.h"
 
@@ -13,14 +14,21 @@
  * https://stackoverflow.com/questions/34880638/compound-literal-lifetime-and-if-blocks
  *
  * Note that we use the GNU variant of strerror_r() here. */
-static inline const char * STRERROR(int errnum) {
+static inline char *_strerror(int errnum, char *buf, size_t buf_size) {
 #ifdef __GLIBC__
-        return strerror_r(abs(errnum), (char[ERRNO_BUF_LEN]){}, ERRNO_BUF_LEN);
+        return strerror_r(abs(errnum), buf, buf_size);
 #else
-        static __thread char buf[ERRNO_BUF_LEN];
-        return strerror_r(abs(errnum), buf, ERRNO_BUF_LEN) ? "unknown error" : buf;
+        static const char unknown_error[] = "Unknown error";
+        int res = strerror_r(abs(errnum), buf, buf_size);
+
+        if (res)
+               memcpy(buf, unknown_error, sizeof(unknown_error));
+        return buf;
 #endif
 }
+#define STRERROR(errnum) _strerror(abs(errnum), (char[ERRNO_BUF_LEN]){}, ERRNO_BUF_LEN)
+
+
 /* A helper to print an error message or message for functions that return 0 on EOF.
  * Note that we can't use ({ … }) to define a temporary variable, so errnum is
  * evaluated twice. */
