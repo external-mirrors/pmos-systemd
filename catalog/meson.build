@@ -24,7 +24,6 @@ support_sed = 's~%SUPPORT_URL%~@0@~'.format(support_url)
 
 foreach file : in_files
         catalogs += custom_target(
-                file,
                 input : file + '.in',
                 output: file,
                 command : [sed, support_sed, '@INPUT@'],
