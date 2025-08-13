@@ -2,7 +2,7 @@
 #pragma once
 
 #include <grp.h>
-#include <gshadow.h>
+#include "gshadow.h"
 #include <pwd.h>
 #include <shadow.h>
 

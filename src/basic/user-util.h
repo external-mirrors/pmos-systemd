@@ -2,9 +2,6 @@
 #pragma once
 
 #include <grp.h>
-#if ENABLE_GSHADOW
-#  include <gshadow.h>
-#endif
 #include <pwd.h>
 #include <shadow.h>
 #include <stdbool.h>
@@ -12,6 +9,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "gshadow.h"
 #include "string-util.h"
 
 /* Users managed by systemd-homed. See https://systemd.io/UIDS-GIDS for details how this range fits into the rest of the world */

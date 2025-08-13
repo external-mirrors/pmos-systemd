@@ -1,5 +1,11 @@
 #pragma once
 
-#define ENABLE_GSHADOW 0
+#ifndef ENABLE_GSHADOW
+#       define ENABLE_GSHADOW 0
+#endif
 
-struct sgrp {};
+#if ENABLE_GSHADOW
+#       include <gshadow.h>
+#else
+        struct sgrp {};
+#endif
