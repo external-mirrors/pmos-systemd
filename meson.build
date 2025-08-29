@@ -1019,6 +1019,7 @@ librt = cc.find_library('rt')
 libm = cc.find_library('m')
 libdl = cc.find_library('dl')
 libcap = dependency('libcap')
+libintl = cc.find_library('intl', required: false)
 
 # On some architectures, libatomic is required. But on some installations,
 # it is found, but actual linking fails. So let's try to use it opportunistically.
