@@ -1096,6 +1096,7 @@ if not libcrypt.found()
         libcrypt = cc.find_library('crypt')
 endif
 libcap = dependency('libcap')
+libintl = cc.find_library('intl', required: false)
 
 # On some architectures, libatomic is required. But on some installations,
 # it is found, but actual linking fails. So let's try to use it opportunistically.
