@@ -23,6 +23,7 @@
 #include "strv.h"
 #include "tests.h"
 #include "tmpfile-util.h"
+#include "virt.h"
 
 TEST(mount_option_mangle) {
         char *opts = NULL;
