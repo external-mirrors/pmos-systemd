@@ -28,7 +28,9 @@ TEST(dump_run_utmp) {
                         u->ut_type == LOGIN_PROCESS ? "LOGIN_PROCESS" :
                         u->ut_type == USER_PROCESS  ? "USER_PROCESS" :
                         u->ut_type == DEAD_PROCESS  ? "DEAD_PROCESS" :
+#ifdef ACCOUNTING
                         u->ut_type == ACCOUNTING    ? "ACCOUNTING" :
+#endif
                         _type_buf;
                 if (type == _type_buf)
                         xsprintf(_type_buf, "%hd", u->ut_type);
