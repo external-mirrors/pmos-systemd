@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: LGPL-2.1-or-later */
 #include <sys/quota.h>
+#include <linux/quota.h>
 
 #include "blockdev-util.h"
 #include "btrfs-util.h"

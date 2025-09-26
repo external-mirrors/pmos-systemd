@@ -8,6 +8,8 @@
 #include <sys/quota.h>
 #include <sys/vfs.h>
 
+#include <linux/quota.h>
+
 #include "blockdev-util.h"
 #include "btrfs-util.h"
 #include "build-path.h"
