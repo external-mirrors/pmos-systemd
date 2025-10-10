@@ -14,7 +14,8 @@ echo "http://mirror.postmarketos.org/postmarketos/master" >> /etc/apk/repositori
 echo "http://mirror.postmarketos.org/postmarketos/extra-repos/systemd/master" >> /etc/apk/repositories
 apk add -U --allow-untrusted postmarketos-keys
 
-apk add alpine-base alpine-sdk abuild-sudo !openrc
+apk add postmarketos-base postmarketos-baselayout alpine-sdk abuild-sudo
+merge-usr
 
 adduser -D build
 adduser build abuild

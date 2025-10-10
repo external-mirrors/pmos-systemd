@@ -1,4 +1,4 @@
-image: alpine:latest
+image: alpine:edge
 
 before_script: &global_before_scripts
   - ".ci/prepare.sh"
