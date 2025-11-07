@@ -94,7 +94,7 @@ bool hostname_is_valid(const char *s, ValidHostnameFlags flags) {
         if (hyphen)
                 return false;
 
-        if (p-s > HOST_NAME_MAX) /* Note that HOST_NAME_MAX is 64 on Linux, but DNS allows domain names up to
+        if (p-s > MAXHOSTNAMELEN) /* Note that MAXHOSTNAMELEN is 64 on Linux, but DNS allows domain names up to
                                   * 255 characters */
                 return false;
 
@@ -107,7 +107,7 @@ char* hostname_cleanup(char *s) {
 
         assert(s);
 
-        for (p = s, d = s, dot = hyphen = true; *p && d - s < HOST_NAME_MAX; p++)
+        for (p = s, d = s, dot = hyphen = true; *p && d - s < MAXHOSTNAMELEN; p++)
                 if (*p == '.') {
                         if (dot || hyphen)
                                 continue;

@@ -3,6 +3,7 @@
 
 #include "forward.h"
 #include "strv.h"
+#include <linux/param.h> /* For MAXHOSTNAMELEN */
 
 char* get_default_hostname_raw(void);
 

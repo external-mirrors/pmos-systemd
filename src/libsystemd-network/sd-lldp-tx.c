@@ -187,7 +187,7 @@ int sd_lldp_tx_set_hostname(sd_lldp_tx *lldp_tx, const char *hostname) {
 
         /* An empty string unset the previously set hostname. */
         if (!isempty(hostname)) {
-                assert_cc(HOST_NAME_MAX < 512);
+                assert_cc(MAXHOSTNAMELEN < 512);
 
                 if (!hostname_is_valid(hostname, 0))
                         return -EINVAL;
