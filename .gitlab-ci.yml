@@ -1,0 +1,127 @@
+# This defines the rules for when a pipeline should run.
+workflow:
+  rules:
+    # Don't run branch pipeline if an MR is open (only the MR pipeline will run)
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push"
+      when: never
+    # Run for merge requests
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Run scheduled pipeline for autoupdate or manually triggered pipeline
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"
+
+stages:
+  - build
+  - test
+
+# ---
+.image:ubuntu:noble:
+  image: ubuntu:noble
+  before_script: &global_before_scripts
+    - .ci/prepare-apt.sh
+
+.image:pmOS:edge:
+  image: alpine:edge
+  before_script: &global_before_scripts
+    - .ci/prepare-pmos.sh "master" "systemd"
+
+.image:pmOS:v25_06:
+  image: alpine:3.22
+  before_script: &global_before_scripts
+    - .ci/prepare-pmos.sh "v25.06" "systemd"
+
+.build:pmOS:
+  stage: build
+  script:
+    - ".ci/build-pmos.sh"
+  after_script:
+    - cp -r /home/build/packages/ packages/ || true
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - packages/
+      - build/
+  timeout: 1 h
+
+.build:ubuntu:
+  stage: build
+  allow_failure: true
+  script:
+    - ".ci/build-apt.sh"
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - build/
+
+.test:pmOS:
+  stage: test
+  script:
+    - ".ci/test-pmos.sh"
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - logs/
+
+.test:pmOS:check:
+  extends: [ ".test:pmOS" ]
+  variables:
+    CI_ABUILD_STEP: 'check'
+
+.test:pmOS:fuzz:
+  extends: [ ".test:pmOS" ]
+  allow_failure: true
+  variables:
+    CI_ABUILD_STEP: 'fuzz'
+
+.test:pmOS:integration:
+  extends: [ ".test:pmOS" ]
+  allow_failure: true
+  when: manual
+  variables:
+    CI_ABUILD_STEP: 'integration_tests'
+
+.test:ubuntu:
+  stage: test
+  allow_failure: true
+  script:
+    - ".ci/test.sh"
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - build/meson-logs/
+
+# ---
+
+#build:ubuntu:noble:
+#  when: manual
+#  extends: [ ".build:ubuntu", ".image:ubuntu:noble"]
+
+#test:ubuntu:noble:
+#  extends: [ ".test:ubuntu", ".image:ubuntu:noble"]
+#  needs: [ "build:ubuntu:noble" ]
+
+build:pmOS:v25_06:
+  extends: [ ".build:pmOS", ".image:pmOS:v25_06" ]
+
+test:pmOS:v25_06:check:
+  allow_failure: true
+  extends: [ ".test:pmOS:check", ".image:pmOS:v25_06" ]
+  needs: [ "build:pmOS:v25_06" ]
+
+test:pmOS:v25_06:fuzz:
+  extends: [ ".test:pmOS:fuzz", ".image:pmOS:v25_06" ]
+  needs: [ "build:pmOS:v25_06" ]
+
+build:pmOS:edge:
+  extends: [ ".build:pmOS", ".image:pmOS:edge" ]
+
+test:pmOS:edge:check:
+  extends: [ ".test:pmOS:check", ".image:pmOS:edge" ]
+  needs: [ "build:pmOS:edge" ]
+
+test:pmOS:edge:fuzz:
+  extends: [ ".test:pmOS:fuzz", ".image:pmOS:edge" ]
+  needs: [ "build:pmOS:edge" ]
+
+#test:pmOS:edge:integration:
+#  extends: [ ".test:pmOS:integration", ".image:pmOS:edge" ]
+#  needs: [ "build:pmOS:edge" ]

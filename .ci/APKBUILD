@@ -1,0 +1,244 @@
+pkgname=systemd
+pkgver=$(cat meson.version)_git$(date -I | tr -d '-')
+pkgrel=0
+pkgdesc="The artifacts version from CI (pmos/systemd)"
+url="https://gitlab.com/postmarketOS/systemd"
+arch="all"
+license="MIT AND GPL-2.0-only AND LGPL-2.1-or-later"
+
+# We use the dbus-dev and polkit-dev from pmOS/builtin systemd automatically
+makedepends="
+	acl
+	acl-dev
+	audit-dev
+	bash
+	bash-completion
+	bpftool
+	clang
+	cmake
+	coreutils
+	cryptsetup-dev
+	curl-dev
+	glib-dev
+	gperf
+	kmod-dev
+	libapparmor-dev
+	libbpf-dev
+	libcap-dev
+	libfido2-dev
+	libgcc
+	libgcrypt-dev
+	libintl
+	libiptcdata-dev
+	libmicrohttpd-dev
+	libpwquality
+	libqrencode-dev
+	libseccomp-dev
+	libselinux-dev
+	libxkbcommon-dev
+	linux-pam-dev
+	linux-lts-dev
+	llvm
+	lz4-dev
+	meson
+	musl-dev
+	pcre2-dev
+	perl
+	pkgconf
+	py3-jinja2
+	py3-lxml
+	python3-dev
+	rsync
+	util-linux-dev
+	xz-dev
+	zstd-dev
+
+
+	dbus-dev
+	polkit-dev
+
+	bzip2-dev
+	elfutils-dev
+	iptables-dev
+	libarchive-dev
+	libiptcdata-dev
+	libpwquality-dev
+	openssl-dev
+	py3-pefile
+	tpm2-tss-dev
+	tpm2-tss-esys
+	tpm2-tss-mu
+	tpm2-tss-rc
+	tpm2-tss-tcti-device
+	utmps-dev
+	utmps-static
+	zlib-dev
+	"
+
+checkdepends="
+	grep
+	"
+if [ "$CI_ABUILD_STEP" = "integration_tests" ]; then
+	checkdepends="$checkdepends mkosi"
+fi
+
+depends="
+	tzdata
+
+	kbd
+	kmod
+	util-linux-login
+	less
+	so:libkmod.so.2
+	"
+
+builddir="$startdir"
+subpackages="$pkgname-dev $pkgname-dbg $pkgname-lang $pkgname-doc"
+
+build() {
+	abuild-meson \
+		-Dlibc=musl \
+		-Dinstall-tests=true \
+		-Dslow-tests=true \
+		-Dtests=unsafe \
+		\
+		-Dsysupdated=enabled \
+		-Dsysupdate=enabled \
+		\
+		-Dman=enabled \
+		-Dpam=enabled \
+		-Dpolkit=enabled \
+		-Dcryptolib=gcrypt \
+		-Ddefault-network=true \
+		-Defi=true \
+		-Delfutils=enabled \
+		-Dgcrypt=true \
+		-Dlibfido2=disabled \
+		\
+		-Dmode=release \
+		-Dsplit-bin=true \
+		\
+		-Ddebug-shell=/bin/ash \
+		-Dkmod-path=/bin/kmod \
+		-Dntp-servers="0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 4.pool.ntp.org" \
+		-Dpamconfdir=/etc/pam.d \
+		-Dpamlibdir=/usr/lib/security \
+		-Dsulogin-path=/sbin/sulogin \
+		-Dsupport-url="https://gitlab.postmarketos.org/groups/postmarketOS/-/issues" \
+		-Dfirst-boot-full-preset=true \
+		\
+		-Dbootloader=disabled \
+		-Drpmmacrosdir="no" \
+		-Dsysvinit-path="" \
+		\
+		-Dhtml=disabled \
+		\
+		-Dsystem-alloc-uid-min=101 \
+		-Dsystem-alloc-gid-min=101 \
+		-Dsystem-uid-max=999 \
+		-Dsystem-gid-max=999 \
+		-Dwheel-group=true \
+		-Dnobody-user=nobody \
+		-Dnobody-group=nobody \
+		\
+		-Dcreate-log-dirs=true \
+		-Ddefault-kill-user-processes=true \
+		-Ddefault-locale=en_US.UTF-8 \
+		\
+		-Ddefault-dns-over-tls=yes \
+		-Ddns-servers="9.9.9.10#dns10.quad9.net 149.112.112.10#dns10.quad9.net 2620:fe::10#dns10.quad9.net 2620:fe::fe:10#dns10.quad9.net" \
+		build .
+	meson compile ${JOBS:+-j ${JOBS}} -C build
+}
+
+_run_suite() {
+	meson test --no-rebuild --print-errorlogs -C build --suite "$1"
+	install -D build/meson-logs/testlog.txt "logs/$1.txt"
+}
+
+fuzz() {
+	_run_suite "systemd:fuzz"
+}
+
+check() {
+	_suites="
+		systemd:boot
+		systemd:busctl
+		systemd:core
+		systemd:dist
+		systemd:example
+		systemd:fstab
+		systemd:headers
+		systemd:journal-remote
+		systemd:journal
+		systemd:libsystemd
+		systemd:libudev
+		systemd:locale
+		systemd:login
+		systemd:machine
+		systemd:network
+		systemd:nspawn
+		systemd:nsresourced
+		systemd:oom
+		systemd:pam
+		systemd:resolve
+		systemd:shutdown
+		systemd:sleep
+		systemd:systemctl
+		systemd:sysusers
+		systemd:test
+		systemd:timesync
+		systemd:tmpfiles
+		systemd:udev
+		systemd:vmspawn
+		systemd:xdg-autostart-generator
+	"
+
+	for _suite in $_suites ; do
+		_run_suite "$_suite"
+	done
+}
+
+integration_tests() {
+	sed -i 's|MinimumVersion=commit:[[:alnum:]]*$||' mkosi/mkosi.conf
+	_run_suite "systemd:integration-tests"
+}
+
+package() {
+	provides="
+		busctl
+		elogind
+		eudev
+		eudev-libs
+		openrc-settingsd=$pkgver-r$pkgrel
+		resolvconf
+		udev
+
+		$pkgname-libs=$pkgver-r$pkgrel
+		$pkgname-libs-private=$pkgver-r$pkgrel
+		$pkgname-journald-remote=$pkgver-r$pkgrel
+		$pkgname-journald-upload=$pkgver-r$pkgrel
+		$pkgname-journald=$pkgver-r$pkgrel
+		$pkgname-journald-systemd=$pkgver-r$pkgrel
+		$pkgname-udevd=$pkgver-r$pkgrel
+		$pkgname-logind=$pkgver-r$pkgrel
+		$pkgname-logind-systemd=$pkgver-r$pkgrel
+		$pkgname-timesyncd=$pkgver-r$pkgrel
+		$pkgname-timesyncd-systemd=$pkgver-r$pkgrel
+		$pkgname-networkd=$pkgver-r$pkgrel
+		$pkgname-networkd-systemd=$pkgver-r$pkgrel
+		$pkgname-resolved=$pkgver-r$pkgrel
+		$pkgname-resolved-systemd=$pkgver-r$pkgrel
+		"
+	depends="!openrc"
+	provider_priority=100
+
+	DESTDIR="$pkgdir" meson install --no-rebuild -C build
+}
+
+dev() {
+	provides="eudev-dev udev-dev"
+	provider_priority=100
+
+	default_dev
+}
