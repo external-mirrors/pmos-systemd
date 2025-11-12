@@ -174,11 +174,11 @@ int write_string_stream_full(
         }
 
         if (fputs(line, f) == EOF)
-                return -errno;
+                return errno_or_else(EIO);
 
         if (needs_nl)
                 if (fputc('\n', f) == EOF)
-                        return -errno;
+                        return errno_or_else(EIO);
 
         if (flags & WRITE_STRING_FILE_SYNC)
                 r = fflush_sync_and_check(f);
